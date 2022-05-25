@@ -35,7 +35,7 @@ class armGrab():
         except CvBridgeError as e:
             print(e)
         if(self.request):
-            self.rvec, self.tvec = self.aruco_detect.getVectors(cv2_img, markerSize = 25)
+            self.rvec, self.tvec = self.aruco_detect.getVectors(cv2_img, markerSize = 35)
             if self.rvec is not None:
             #     print("rvec : ", self.rvec)
             #     print("tvec : ", self.tvec)
@@ -52,38 +52,29 @@ class armGrab():
         if(self.request):
             self.gripper.move("a")
             self.gripper.move("o")
-            x = 376.0587
-            y = -436.6104
-            z = 734.17
-            u = 180.0
-            v = 0.0
-            w = -135.05 + 45
-            self.robotcontrol_func.set_TMPos([x, y, z, u, v, w])
+            self.robotcontrol_func.set_tablePos()
+            self.robotcontrol_func.set_fixPos()
             time.sleep(5)
             self.request = False
-            x = 376.0587
-            y = -436.6104
-            z = 734.17
-            u = 180.0
-            v = 0.0
-            w = -135.05
-            self.robotcontrol_func.set_TMPos([x, y, z, u, v, w])
+            self.robotcontrol_func.set_tablePos()
             if self.rvec is not None:
                 print("rvec : ", self.rvec)
                 print("tvec : ", self.tvec)
                 current_pos = self.robotcontrol_func.get_TMPos()
                 print(current_pos)
                 x = current_pos[0] - self.tvec[0][0][0] * math.cos(-135 * math.pi/180) - self.tvec[0][0][1] * math.sin(-45 * math.pi/180) \
-                    + 45 * math.cos(45 * math.pi) + 90 * math.cos(45 * math.pi/180) 
+                    + 47 * math.cos(45 * math.pi) + 90 * math.cos(45 * math.pi/180) 
                 y = current_pos[1] - self.tvec[0][0][0] * math.sin(-135 * math.pi/180) - self.tvec[0][0][1] * math.cos(-45 * math.pi/180) \
-                    + 45 * math.sin(45 * math.pi) - 90 * math.sin(45 * math.pi/180) 
+                    + 47 * math.sin(45 * math.pi) - 90 * math.sin(45 * math.pi/180) 
                 z = current_pos[2]
                 u = current_pos[3] 
                 v = current_pos[4]
                 w = current_pos[5]
                 self.robotcontrol_func.set_TMPos([x, y, z, u, v, w])
-                self.robotcontrol_func.set_TMPos([x, y, z - self.tvec[0][0][2] + 100.8, u, v, w])
+                self.robotcontrol_func.set_TMPos([x, y, z - self.tvec[0][0][2] + 120.8, u, v, w])
                 self.gripper.move("c")
+                time.sleep(1)
+                self.gripper.move("o")
 
                 # self.request = False
                 return GrabArUcoResponse(True)

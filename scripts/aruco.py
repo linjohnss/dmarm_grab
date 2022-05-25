@@ -9,9 +9,9 @@ class arucoDetection():
         self.arucoParams = cv2.aruco.DetectorParameters_create()
         
         #rgb camera Intrinsics
-        # self.mtx = np.array([[ 611.057861328125, 0., 319.10821533203125] ,
-        #                      [0., 611.0257568359375, 241.3106689453125] ,
-        #                      [0., 0., 1. ]])
+        self.mtx = np.array([[ 611.057861328125, 0., 319.10821533203125] ,
+                             [0., 611.0257568359375, 241.3106689453125] ,
+                             [0., 0., 1. ]])
 
         # D415
         self.mtx = np.array([[ 616.1934814453125, 0., 312.9720764160156] ,

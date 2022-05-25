@@ -91,5 +91,33 @@ class RobotControl_Func():
         # print(self.robot)
         
         return current_pos
+    
+    def set_initPos(self):
+        x = 376.0587
+        y = -436.6104
+        z = 734.17
+        u = 180.0
+        v = 0.0
+        w = -135.05
+        self.set_TMPos([x, y, z, u, v, w])
+
+    def set_fixPos(self):
+        current_pos = self.get_TMPos()
+        x = current_pos[0]
+        y = current_pos[1]
+        z = current_pos[2]
+        u = current_pos[3]
+        v = current_pos[4]
+        w = current_pos[5] + 45
+        self.set_TMPos([x, y, z, u, v, w])
+    
+    def set_tablePos(self):
+        x = 901.81
+        y = 145.34
+        z = 659.33
+        u = 180.0
+        v = 0.0
+        w = -135.05
+        self.set_TMPos([x, y, z, u, v, w])
 
         
