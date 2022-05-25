@@ -2,4 +2,4 @@ bool start
 
 ---
 
-sensor_msgs/CompressedImage image
+bool end

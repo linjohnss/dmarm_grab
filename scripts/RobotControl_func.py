@@ -9,25 +9,16 @@ import rospy
 from tm_msgs.msg import *
 from tm_msgs.srv import *
 
-mutex = QMutex()
-
-# Robot Arm move
-class myMitter(QObject):
-    done = pyqtSignal(bool)
-
-class worker(QRunnable):
+class worker():
         def __init__(self, pos, speed, line):
             super(worker, self).__init__()
 
             self.pos = pos
             self.speed = speed
             self.line = line
-            self.mitter = myMitter()
 
-        @pyqtSlot()
         def run(self):
             try:
-                mutex.lock()
                 rospy.wait_for_service('tm_driver/ask_sta')
                 rospy.wait_for_service('tm_driver/set_event')
                 rospy.wait_for_service('tm_driver/set_positions')
@@ -56,13 +47,6 @@ class worker(QRunnable):
             except Exception as e: 
                 print(e)
 
-
-            # self.emitter.done.emit(False)
-            self.mitter.done.emit(True)
-            # print('emit')
-
-            mutex.unlock()
-
 class RobotControl_Func():
     def __init__(self):
         super().__init__()
@@ -75,20 +59,6 @@ class RobotControl_Func():
         self.Rz = 0
         self.speed = 0
         self.accel = 0
-
-        self.pool = QThreadPool.globalInstance()
-        # For Arm
-        self.pool.setMaxThreadCount(1)
-        # For Arm + AMM
-        # self.pool.setMaxThreadCount(2) 
-        self.threadDone = True
-
-
-
-
-    def on_worker_done(self, threadDone):
-        print(threadDone)
-        self.threadDone = threadDone
 
     def set_TMPos(self, pos, speed = 20, line = False):
         # transself.set_TMPos_new(pos)form to TM robot coordinate
@@ -103,22 +73,7 @@ class RobotControl_Func():
 
         self.threadDone = False
         runnable = worker(tmp, speed, line)
-        runnable.mitter.done.connect(self.on_worker_done)
-        self.pool.start(runnable)
-
-
-        count = 0
-        while(self.threadDone == False):
-            # magic functon -> 用來更新UI介面
-            QApplication.processEvents()
-
-            
-            # if((count % 10000) == 0):
-            #     print(self.get_TMPos())
-            # count += 1
-
-            # print(self.threadDone)
-            # time.sleep(1)
+        runnable.run()
         print('Move')
 
     def get_TMPos(self):
@@ -136,16 +91,5 @@ class RobotControl_Func():
         # print(self.robot)
         
         return current_pos
-    def Tracker_on_off_client(self):
-        rospy.wait_for_service('darknet_ros/is_on')
-        rospy.wait_for_service('detection_publisher/Tracker_on_off')
-        try:
-            Tracker_on_off_func = rospy.ServiceProxy('darknet_ros/is_on', IsOn)
-            Tracker_on_off_func2 = rospy.ServiceProxy('detection_publisher/Tracker_on_off', Tracker_on_off)
-            resp2 = Tracker_on_off_func2()
-            resp1 = Tracker_on_off_func()
-            return (resp1.status, resp2.status)
-        except rospy.ServiceException as e:
-            print("Service call failed: %s"%e)
 
         

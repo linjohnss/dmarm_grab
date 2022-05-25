@@ -12,9 +12,13 @@ def grab_aruco_client(start):
     try:
         grab_aruco = rospy.ServiceProxy('grab_aruco', GrabArUco)
         resp1 = grab_aruco(start)
-        image = bridge.compressed_imgmsg_to_cv2(resp1, "bgr8")
-        cv2.imshow("realsense", image)
-        cv2.waitKey(3)
+        if (resp1.end):
+            print("Get Image!")
+        else:
+            print("Failed!")
+        # image = bridge.compressed_imgmsg_to_cv2(resp1, "bgr8")
+        # cv2.imshow("realsense", image)
+        # cv2.waitKey(3)
     except rospy.ServiceException as e:
         print("Service call failed: %s"%e)
 
