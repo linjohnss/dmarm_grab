@@ -9,20 +9,31 @@ class arucoDetection():
         self.arucoParams = cv2.aruco.DetectorParameters_create()
         
         #rgb camera Intrinsics
-        self.mtx = np.array([[ 611.057861328125, 0., 319.10821533203125] ,
-                             [0., 611.0257568359375, 241.3106689453125] ,
-                             [0., 0., 1. ]])
+        # self.mtx = np.array([[ 611.057861328125, 0., 319.10821533203125] ,
+        #                      [0., 611.0257568359375, 241.3106689453125] ,
+        #                      [0., 0., 1. ]])
 
         # D415
-        self.mtx = np.array([[ 616.1934814453125, 0., 312.9720764160156] ,
-                             [0., 615.5568237304688, 237.23646545410156] ,
-                             [0., 0., 1. ]])
+        self.mtx = np.array([[924.2902221679688, 0.0, 629.4581298828125],
+                            [0.0, 923.335205078125, 355.8547058105469], 
+                            [0.0, 0.0, 1.0]])
+
+        #  # D455
+        # self.mtx = np.array([[ 378.8148193359375, 0., 321.3387756347656] ,
+        #                      [0., 378.435302734375, 239.5035400390625] ,
+        #                      [0., 0., 1. ]])
 
         #rgb camera distortion matrix
         self.dist =np.array([[ 0., 0., 0., 0., 0. ]])
 
+        # D455
+        # self.dist =np.array([[-0.058569442480802536, 0.07267159968614578, -0.0007432405836880207, -0.000961679092142731, -0.02312898263335228]])
+
+
         #convert bridge from sensor_msgs.msg/Image to cv2.mat
         self.bridge = CvBridge()
+
+        self.indexs = ['Disinfectant', 'Pill box']
 
 
     '''
@@ -40,48 +51,14 @@ class arucoDetection():
             return None, None
         else:
             rvec, tvec, objecPoint= cv2.aruco.estimatePoseSingleMarkers(corners, markerSize, self.mtx, self.dist)
-
-        return rvec, tvec
+        return ids, rvec, tvec
 
     #draw aruco axes
-    def drawFrameAxes(self, image, rvec, tvec, axesSize=35):
+    def drawFrameAxes(self, image, ids, rvec, tvec, axesSize=35):
+        # cv2.aruco.drawDetectedMarkers(image, self.corners, ids)
         for i in range(rvec.shape[0]):
             cv2.drawFrameAxes(image, self.mtx, self.dist, rvec[i], tvec[i], axesSize)
+            if ids[i][0] < 2:
+                cv2.putText(image, self.indexs[ids[i][0]], (10, 10*(i+1)), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 255), 1, cv2.LINE_AA)
+
         return image
-    
-    def callback(self, data):
-        image = self.bridge.imgmsg_to_cv2(data, "bgr8")
-
-        rvec, tvec = self.getVectors(image)
-        
-        if rvec is not None:
-            print("rvec : ", rvec)
-            print("tvec : ", tvec)
-            image = self.drawFrameAxes(image, rvec, tvec)
-        
-        # cv2.imshow("realsense", image)
-        # cv2.waitKey(3)
-
-# from aruco_ros.srv import image, imageResponse
-# from topic_tools.srv import MuxSelect
-
-# def aruco_image(req):
-#     switch = rospy.ServiceProxy('/mux_aruco/select', MuxSelect)
-#     if req.mode:
-#         r = switch("/camera/color/image_raw")
-#         print("set input /camera/color/image_raw")
-#         print(r)
-#     else:
-#         r = switch("/no")
-#         print("set input /no")
-#         print(r)
-#     return imageResponse()
-
-# if __name__ == '__main__' :
-#     import rospy
-#     from sensor_msgs.msg import Image
-#     aruco_detect = arucoDetection()
-#     rospy.init_node('aruco', anonymous=True)
-#     rospy.Subscriber("/aruco/image_raw", Image, aruco_detect.callback)
-#     s = rospy.Service('aruco_image', image, aruco_image) # 创建Service Server
-#     rospy.spin()

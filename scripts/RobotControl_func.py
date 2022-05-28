@@ -71,7 +71,6 @@ class RobotControl_Func():
         tmp.append(pos[4] * np.pi / 180)
         tmp.append(pos[5] * np.pi / 180)
 
-        self.threadDone = False
         runnable = worker(tmp, speed, line)
         runnable.run()
         print('Move')
@@ -88,8 +87,7 @@ class RobotControl_Func():
         current_pos[3] = current_pos[3] * 180 / np.pi
         current_pos[4] = current_pos[4] * 180 / np.pi
         current_pos[5] = current_pos[5] * 180 / np.pi
-        # print(self.robot)
-        
+        # print(self.robot)  
         return current_pos
     
     def set_initPos(self):
@@ -98,8 +96,9 @@ class RobotControl_Func():
         z = 734.17
         u = 180.0
         v = 0.0
-        w = -135.05
+        w = 45.0
         self.set_TMPos([x, y, z, u, v, w])
+        time.sleep(5)
 
     def set_fixPos(self):
         current_pos = self.get_TMPos()
@@ -117,7 +116,8 @@ class RobotControl_Func():
         z = 659.33
         u = 180.0
         v = 0.0
-        w = -135.05
+        w = 45.0
         self.set_TMPos([x, y, z, u, v, w])
+        time.sleep(5)
 
         

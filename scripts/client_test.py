@@ -4,7 +4,7 @@ from __future__ import print_function
 
 import sys
 import rospy
-from dmarm_grab.srv import *
+from tmarm_grab.srv import *
 from cv_bridge import CvBridge
 bridge = CvBridge()
 def grab_aruco_client(start):
@@ -13,12 +13,9 @@ def grab_aruco_client(start):
         grab_aruco = rospy.ServiceProxy('grab_aruco', GrabArUco)
         resp1 = grab_aruco(start)
         if (resp1.end):
-            print("Get Image!")
+            print("Done!")
         else:
             print("Failed!")
-        # image = bridge.compressed_imgmsg_to_cv2(resp1, "bgr8")
-        # cv2.imshow("realsense", image)
-        # cv2.waitKey(3)
     except rospy.ServiceException as e:
         print("Service call failed: %s"%e)
 
