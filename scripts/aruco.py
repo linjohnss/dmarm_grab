@@ -5,7 +5,7 @@ from cv_bridge import CvBridge
 class arucoDetection():
     def __init__(self):
         #self.arucoDict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_6X6_250)
-        self.arucoDict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_4X4_250)
+        self.arucoDict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_5X5_250)
         self.arucoParams = cv2.aruco.DetectorParameters_create()
         
         #rgb camera Intrinsics
@@ -14,9 +14,7 @@ class arucoDetection():
         #                      [0., 0., 1. ]])
 
         # D415
-        self.mtx = np.array([[924.2902221679688, 0.0, 629.4581298828125],
-                            [0.0, 923.335205078125, 355.8547058105469], 
-                            [0.0, 0.0, 1.0]])
+        self.mtx = np.array([[616.1934814453125, 0.0, 312.9720764160156], [0.0, 615.5568237304688, 237.23646545410156], [0.0, 0.0, 1.0]])
 
         #  # D455
         # self.mtx = np.array([[ 378.8148193359375, 0., 321.3387756347656] ,
@@ -45,17 +43,17 @@ class arucoDetection():
     '''
     def getVectors(self, image, markerSize=35):
         # aruco detecte
-        (corners, ids, rejected) = cv2.aruco.detectMarkers(image, self.arucoDict, parameters=self.arucoParams)
+        (self.corners, ids, rejected) = cv2.aruco.detectMarkers(image, self.arucoDict, parameters=self.arucoParams)
 
         if id is None:
             return None, None
         else:
-            rvec, tvec, objecPoint= cv2.aruco.estimatePoseSingleMarkers(corners, markerSize, self.mtx, self.dist)
+            rvec, tvec, objecPoint= cv2.aruco.estimatePoseSingleMarkers(self.corners, markerSize, self.mtx, self.dist)
         return ids, rvec, tvec
 
     #draw aruco axes
     def drawFrameAxes(self, image, ids, rvec, tvec, axesSize=35):
-        # cv2.aruco.drawDetectedMarkers(image, self.corners, ids)
+        cv2.aruco.drawDetectedMarkers(image, self.corners, ids)
         for i in range(rvec.shape[0]):
             cv2.drawFrameAxes(image, self.mtx, self.dist, rvec[i], tvec[i], axesSize)
             if ids[i][0] < 2:

@@ -60,7 +60,7 @@ class RobotControl_Func():
         self.speed = 0
         self.accel = 0
 
-    def set_TMPos(self, pos, speed = 20, line = False):
+    def set_TMPos(self, pos, speed = 20, line = True):
         # transself.set_TMPos_new(pos)form to TM robot coordinate
         tmp = []
 
@@ -110,10 +110,20 @@ class RobotControl_Func():
         w = current_pos[5] + 45
         self.set_TMPos([x, y, z, u, v, w])
     
+    # def set_tablePos(self):
+    #     x = 901.81
+    #     y = 145.34
+    #     z = 659.33
+    #     u = 180.0
+    #     v = 0.0
+    #     w = 45.0
+    #     self.set_TMPos([x, y, z, u, v, w])
+    #     time.sleep(5)
+    
     def set_tablePos(self):
-        x = 901.81
-        y = 145.34
-        z = 659.33
+        x = -363.24
+        y = -801.15
+        z = 679.03
         u = 180.0
         v = 0.0
         w = 45.0

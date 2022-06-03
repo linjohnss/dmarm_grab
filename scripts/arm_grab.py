@@ -15,6 +15,7 @@ import numpy as np
 import time
 import math
 import ros_gripper
+from scipy.spatial.transform import Rotation as R
 
 class armGrab():
     def __init__(self):
@@ -26,10 +27,13 @@ class armGrab():
         self.gripper = ros_gripper.gripperController()
         self.current_pos = []
         self.request = False
-        self.indexs = ['Disinfectant', 'Pill box']
         self.camera2gripper = np.array([[math.cos(-135 * math.pi/180), math.sin(-135 * math.pi/180), 0],
                                         [math.sin(-135 * math.pi/180), -math.cos(-135 * math.pi/180), 0],
                                         [0, 0, 1]])
+        self.id_list=np.array([
+            [15, 5, 70],
+            [20, 25, 210]
+        ])
 
     def callback(self, msg):
         # ROS_INFO("Received an image!")
@@ -39,7 +43,7 @@ class armGrab():
         except CvBridgeError as e:
             print(e)
         if(self.request):
-            self.ids, self.rvec, self.tvec = self.aruco_detect.getVectors(cv2_img, markerSize = 35)
+            self.ids, self.rvec, self.tvec = self.aruco_detect.getVectors(cv2_img, markerSize = 25)
             if self.rvec is not None:
                 self.aruco_detect.drawFrameAxes(cv2_img, self.ids, self.rvec, self.tvec)
             msg = CompressedImage()
@@ -47,19 +51,34 @@ class armGrab():
             msg.format = "jpeg"
             msg.data = np.array(cv2.imencode('.jpg', cv2_img)[1]).tostring()
             self.pub.publish(msg)
-    def move_arm(self, isput):
-        if self.tvec is not None:
-            print("ids : ", self.ids)
-            print("rvec : ", self.rvec)
-            print("tvec : ", self.tvec)
-            rvec = self.rvec[0][0]
-            tvec = self.tvec[0][0]
+
+    def move_arm(self, isput, item):
+        print("self.ids:",self.ids)
+        row_tmp, _ = np.where(self.ids == item)
+        if isput:
+            print("self.list_index:",self.list_index)
+        if len(row_tmp) != 0:
+            row = row_tmp[0]
+            print(row)
+            
+            rvec = self.rvec[row][0]
+            tvec = self.tvec[row][0]
+        
+            print("id: ", item)
+            print("rvec : ", rvec)
+            print("tvec : ", tvec)
+
             tvec[0] -= 35
-            tvec[1] += 70 
+            tvec[1] += 65 
+            buf = 130.5 #bottle height
             if isput:
-                tvec[2] -= (10+200)
+                buf += 10 + self.id_list[self.list_index][2]
+            else:
+                row_tmp, _= np.where(self.id_list == item)
+                # remember where to put
+                self.list_index = row_tmp[0]
+                print("listindex: ", self.list_index)
             current_pos = self.robotcontrol_func.get_TMPos()
-            print(current_pos)
             tvec = np.matmul(self.camera2gripper, tvec)
             x = current_pos[0] + tvec[0] 
             y = current_pos[1] + tvec[1] 
@@ -68,33 +87,44 @@ class armGrab():
             v = current_pos[4]
             w = current_pos[5]
             self.robotcontrol_func.set_TMPos([x, y, z, u, v, w])
-            self.robotcontrol_func.set_TMPos([x, y, z - tvec[2] + 120.5, u, v, w])    
+            self.robotcontrol_func.set_TMPos([x, y, z - tvec[2] + buf + 50, u, v, w]) 
+            self.robotcontrol_func.set_TMPos([x, y, z - tvec[2] + buf , u, v, w])    
             return True
+        else:
+            print("not found")
         return False
 
     def handle_grab_aruco(self, req):
-        self.request = req.start
+        self.request = True
         if(self.request):
-            self.gripper.move("r")
+            # self.gripper.move("r")
             self.gripper.move("a")
             self.gripper.move("o")
             self.robotcontrol_func.set_initPos()
-            if self.move_arm(False):
+            if req.isput == False:
+                self.robotcontrol_func.set_tablePos()
+            if self.move_arm(False, req.id):
                 self.gripper.move("c")
                 time.sleep(1)
-                self.robotcontrol_func.set_tablePos()
-                if self.move_arm(True):
+                if req.isput:
+                    self.robotcontrol_func.set_tablePos()
+                else:
+                    self.robotcontrol_func.set_initPos()
+                    
+                if self.move_arm(True, self.id_list[self.list_index][1]):
                     self.gripper.move("o")
                     time.sleep(1)
+                    # self.robotcontrol_func.set_tablePos()
+                    # if self.move_arm(False, req.id):
+                    #     self.gripper.move("c")
+                    #     time.sleep(1)
+                    #     self.robotcontrol_func.set_initPos()
+                    #     if self.move_arm(True, self.id_list[self.list_index][1]):
+                    #         self.gripper.move("o")
+                    #         time.sleep(1)
+                if req.isput:
                     self.robotcontrol_func.set_tablePos()
-                    if self.move_arm(False):
-                        self.gripper.move("c")
-                        time.sleep(1)
-                        self.robotcontrol_func.set_initPos()
-                        if self.move_arm(True):
-                            self.gripper.move("o")
-                            time.sleep(1)
-                            self.robotcontrol_func.set_initPos()
+                self.robotcontrol_func.set_initPos()
                 self.request = False
                 return GrabArUcoResponse(True)
             self.request = False
