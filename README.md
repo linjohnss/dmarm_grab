@@ -7,7 +7,7 @@ RealSense D415(EIH)
 
 TM Robot arm
 
-![S__18202640](https://user-images.githubusercontent.com/61956056/172375264-828dbe29-4e45-4e5b-bbbe-3e3420fca347.jpg =500x)
+![S__18202640](https://user-images.githubusercontent.com/61956056/172375264-828dbe29-4e45-4e5b-bbbe-3e3420fca347.jpg)
 
 ## tmr_ros1
 ```shell=
@@ -31,7 +31,9 @@ bool isput
 bool end
 ```
 ## Detection Image
+```
 /output/image_raw/compressed
+```
 
 ## Strat Server
 ```shell=
