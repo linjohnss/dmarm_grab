@@ -30,6 +30,9 @@ bool isput
 
 bool end
 ```
+## Detection Image
+/output/image_raw/compressed
+
 ## Strat Server
 ```shell=
 rosrun tmarm_grab arm_grab.py
@@ -41,8 +44,7 @@ rosrun tmarm_grab client_test.py True
 
 ## Demo
 
-
-![](https://user-images.githubusercontent.com/61956056/172375447-83b8e4c1-cb4d-427c-9487-ae7778200e02.mov)
+![ ](https://user-images.githubusercontent.com/61956056/172375447-83b8e4c1-cb4d-427c-9487-ae7778200e02.mov)
 
 
 
