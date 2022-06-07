@@ -110,18 +110,9 @@ class armGrab():
                     self.robotcontrol_func.set_tablePos()
                 else:
                     self.robotcontrol_func.set_initPos()
-                    
                 if self.move_arm(True, self.id_list[self.list_index][1]):
                     self.gripper.move("o")
                     time.sleep(1)
-                    # self.robotcontrol_func.set_tablePos()
-                    # if self.move_arm(False, req.id):
-                    #     self.gripper.move("c")
-                    #     time.sleep(1)
-                    #     self.robotcontrol_func.set_initPos()
-                    #     if self.move_arm(True, self.id_list[self.list_index][1]):
-                    #         self.gripper.move("o")
-                    #         time.sleep(1)
                 if req.isput:
                     self.robotcontrol_func.set_tablePos()
                 self.robotcontrol_func.set_initPos()
